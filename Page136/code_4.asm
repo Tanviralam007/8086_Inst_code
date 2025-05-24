@@ -1,5 +1,5 @@
-;Write a program that. prompts the user to type a binary number 
-;of 16 digits or less, and outputs It In hex on the next line. If the
+;Write a program that prompts the user to type a binary number 
+;of 16 digits or less, and outputs it in hex on the next line. If the
 ;user enters an illegal character, he or she should be prompted to begin again.
 ;Sample execution: 
 ;TYPE A BINARY NUMBER, UP TO 16 DIGITS: 11100001
@@ -86,38 +86,35 @@ MAIN ENDP
 
 ; Procedure to convert binary string to hex and display
 BINARY_TO_HEX PROC
-    ; Start from the end of the binary string
+    ; Start from the beginning of the binary string
     MOV CL, DIGIT_COUNT
     MOV CH, 0
     LEA SI, BINARY_BUFFER
-    ADD SI, CX          ; Point to end of string
-    DEC SI              ; Point to last character
     
-    MOV BX, 0           ; Will hold our accumulated value
-    MOV DX, 1           ; Power of 2 (starts with 2^0 = 1)
+    MOV AX, 0           ; Will hold our accumulated value
     
-    ; Convert binary string to number
+    ; Convert binary string to number using Horner's method
 CONVERT_LOOP:
     CMP CX, 0
     JE DISPLAY_RESULT
     
-    MOV AL, [SI]        ; Get current binary digit
-    SUB AL, '0'         ; Convert ASCII to number
+    ; Multiply current result by 2
+    SHL AX, 1
     
-    CMP AL, 1
-    JNE SKIP_ADD
-    ADD BX, DX          ; Add current power of 2 if bit is 1
+    ; Get current binary digit
+    MOV BL, [SI]
+    SUB BL, '0'         ; Convert ASCII to number
     
-SKIP_ADD:
-    SHL DX, 1           ; Next power of 2
-    DEC SI              ; Move to previous digit
+    ; Add current bit to result
+    ADD AL, BL
+    
+    INC SI              ; Move to next digit
     DEC CX
     JMP CONVERT_LOOP
     
 DISPLAY_RESULT:
-    ; BX now contains the binary number converted to decimal
+    ; AX now contains the binary number converted to decimal
     ; Convert to hex and display
-    MOV AX, BX
     CALL DISPLAY_HEX_NUMBER
     
     RET
